@@ -1,0 +1,36 @@
+:root {
+  --primary: #fcfbf9;
+  --secondary: #0d0c0c;
+  --tertiary: #f8f8f8;
+  --accent: #ff4306;
+  --text-color: #ffffff;
+  --black: #0d0c0c;
+  --grey: #f2f1ef;
+  --light-grey: #e9e9e9;
+  --white: #ffffff;
+  --he-font: "Outfit", system-ui, sans-serif;
+  --he-bg: var(--primary);
+  --he-surface: var(--white);
+  --he-text: var(--secondary);
+  --he-text-muted: var(--secondary);
+  --he-text-soft: var(--secondary);
+  --he-text-subtle: var(--black);
+  --he-border: var(--light-grey);
+  --he-border-soft: var(--grey);
+  --he-success: var(--accent);
+  --he-success-soft: var(--light-grey);
+  --he-success-bg: var(--tertiary);
+  --he-success-text: var(--secondary);
+  --he-danger: var(--accent);
+  --he-warning: var(--accent);
+  --he-warning-soft: var(--light-grey);
+  --he-warning-bg: var(--tertiary);
+  --he-warning-text: var(--secondary);
+  --he-warning-text-soft: var(--secondary);
+  --he-info: var(--accent);
+  --he-primary-subtle: var(--text-color);
+  --he-shadow-sm: 0 1px 4px rgb(0 0 0 / 7%);
+  --he-radius-sm: 8px;
+  --he-radius-md: 10px;
+  --he-radius-lg: 12px;
+}
