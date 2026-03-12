@@ -12,6 +12,7 @@ import {
   LOGO_PATH,
   STORAGE_KEY,
   validateGoalStep,
+  generateSkills,
 } from "./features/hours-exercise/helpers";
 import { storage } from "./utils/storage";
 
@@ -74,7 +75,7 @@ function App() {
         onNext={() => {
           const nextErrors = validateGoalStep(state);
           setErrors(nextErrors);
-          
+          // generateSkills(state);
           if (Object.keys(nextErrors).length === 0) update({ step: 2 });
         }}
       />

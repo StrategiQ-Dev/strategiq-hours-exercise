@@ -59,3 +59,7 @@ export const sortSkillsByGapFirst = (skills) => {
   const indexed = getIndexedSkills(skills);
   return [...indexed.filter((item) => item.score < 6), ...indexed.filter((item) => item.score >= 6)];
 };
+
+export const generateSkills = (state) => {
+  console.log(state);
+}
