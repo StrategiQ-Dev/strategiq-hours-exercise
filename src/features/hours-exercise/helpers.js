@@ -80,6 +80,7 @@ export const createDefaultState = () => ({
   skillLabels: [...SKILLS],
   skills: Array(SKILLS.length).fill(0),
   evidence: Array(SKILLS.length).fill(""),
+  evidenceSuggestions: Array.from({ length: SKILLS.length }, () => []),
 });
 
 export const getSkillColor = (score) => {
@@ -185,5 +186,179 @@ export const generateSkills = async (state) => {
     return normalized;
   } catch (_) {
     return fallback;
+  }
+};
+
+export const generateEvidenceSuggestions = async ({ state, skill, score, plan }) => {
+  const trimmedPlan = String(plan ?? "").trim();
+  if (!trimmedPlan) return { suggestions: [] };
+
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  if (!apiKey) {
+    return {
+      suggestions: [],
+      error: "OpenAI key missing. Add VITE_OPENAI_API_KEY to enable AI suggestions.",
+    };
+  }
+
+  try {
+    const client = new OpenAI({
+      apiKey,
+      dangerouslyAllowBrowser: true,
+    });
+
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.5,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "evidence_plan_suggestions",
+          schema: {
+            type: "object",
+            properties: {
+              suggestions: {
+                type: "array",
+                minItems: 1,
+                maxItems: 6,
+                items: {
+                  type: "object",
+                  properties: {
+                    type: { type: "string" },
+                    task: { type: "string" },
+                    why: { type: "string" },
+                    hours: { type: "number", minimum: 0.5, maximum: 40 },
+                  },
+                  required: ["type", "task", "why", "hours"],
+                  additionalProperties: false,
+                },
+              },
+            },
+            required: ["suggestions"],
+            additionalProperties: false,
+          },
+        },
+      },
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a practical career and learning coach. Convert a user's skill evidence plan into up to 6 concrete next actions. Include a mix of formats where relevant (reading, videos, activities, podcasts, mentoring, exercises). Keep each suggestion specific and short.",
+        },
+        {
+          role: "user",
+          content: `Goal: "${state.goal}".
+Skill: "${skill}" (self-score ${score}/10).
+Current evidence plan: "${trimmedPlan}".
+
+Generate up to 6 suggestions. For each suggestion, provide:
+- type (short label like Read, Video, Activity, Podcast, Course, Mentor)
+- task (specific action)
+- why (why this helps this skill/goal)
+- hours (estimated hours, decimal allowed)
+
+Keep total tone practical and realistic.`,
+        },
+      ],
+    });
+
+    const raw = completion?.choices?.[0]?.message?.content;
+    if (!raw) {
+      return { suggestions: [], error: "No AI response returned. Try again." };
+    }
+
+    const parsed = JSON.parse(raw);
+    const suggestions = Array.isArray(parsed?.suggestions)
+      ? parsed.suggestions
+          .map((item) => ({
+            type: String(item?.type ?? "").trim(),
+            task: String(item?.task ?? "").trim(),
+            why: String(item?.why ?? "").trim(),
+            hours: Number(item?.hours),
+          }))
+          .filter(
+            (item) =>
+              item.type &&
+              item.task &&
+              item.why &&
+              Number.isFinite(item.hours) &&
+              item.hours > 0
+          )
+          .slice(0, 6)
+      : [];
+
+    if (!suggestions.length) {
+      return { suggestions: [], error: "AI could not produce suggestions. Try refining your plan text." };
+    }
+
+    return { suggestions };
+  } catch (_) {
+    return { suggestions: [], error: "Could not generate AI suggestions right now. Please try again." };
+  }
+};
+
+export const generateEvidenceStarterPlan = async ({ state, skill, score }) => {
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  if (!apiKey) {
+    return {
+      plan: "",
+      error: "OpenAI key missing. Add VITE_OPENAI_API_KEY to enable AI starter plans.",
+    };
+  }
+
+  try {
+    const client = new OpenAI({
+      apiKey,
+      dangerouslyAllowBrowser: true,
+    });
+
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.6,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "evidence_starter_plan",
+          schema: {
+            type: "object",
+            properties: {
+              plan: { type: "string" },
+            },
+            required: ["plan"],
+            additionalProperties: false,
+          },
+        },
+      },
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a practical learning coach. Create a short starter evidence plan for one skill. Keep it clear and specific, with 4 to 6 bullet points. Include concrete actions and time cues.",
+        },
+        {
+          role: "user",
+          content: `Goal: "${state.goal}".
+Skill: "${skill}".
+Current skill score: ${score}/10.
+
+Write a starter evidence plan that helps someone who doesn't know where to start. Format as bullet points only.`,
+        },
+      ],
+    });
+
+    const raw = completion?.choices?.[0]?.message?.content;
+    if (!raw) {
+      return { plan: "", error: "No AI response returned. Try again." };
+    }
+
+    const parsed = JSON.parse(raw);
+    const plan = String(parsed?.plan ?? "").trim();
+    if (!plan) {
+      return { plan: "", error: "AI could not create a starter plan. Try again." };
+    }
+
+    return { plan };
+  } catch (_) {
+    return { plan: "", error: "Could not generate an AI starter plan right now. Please try again." };
   }
 };

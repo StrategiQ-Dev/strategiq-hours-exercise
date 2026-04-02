@@ -87,6 +87,7 @@ function App() {
               skillLabels,
               skills: Array(skillLabels.length).fill(0),
               evidence: Array(skillLabels.length).fill(""),
+              evidenceSuggestions: Array.from({ length: skillLabels.length }, () => []),
               step: 2,
             }));
           } finally {
