@@ -1,14 +1,15 @@
-import { SKILLS } from "../../../constants/skills";
 import { getSkillColor } from "../helpers";
 
 function SkillsAssessmentStep({ state, metrics, setState, onBack, onNext }) {
+  const skills = state.skillLabels ?? [];
+
   return (
     <section>
       <h2 className="section-title">Skills Assessment</h2>
       <p className="section-subtitle">Rate yourself honestly from 0 to 10. The target for each skill is 6.</p>
 
       <div className="card card--skills">
-        {SKILLS.map((skill, index) => {
+        {skills.map((skill, index) => {
           const score = state.skills[index];
           const color = getSkillColor(score);
 

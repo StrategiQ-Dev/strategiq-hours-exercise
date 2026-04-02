@@ -1,7 +1,7 @@
 import { getSkillColor, sortSkillsByGapFirst } from "../helpers";
 
 function EvidencePlanStep({ state, setState, onBack, onNext }) {
-  const sortedSkills = sortSkillsByGapFirst(state.skills);
+  const sortedSkills = sortSkillsByGapFirst(state.skills, state.skillLabels);
 
   return (
     <section>

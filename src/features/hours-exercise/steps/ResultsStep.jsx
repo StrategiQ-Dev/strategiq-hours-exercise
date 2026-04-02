@@ -2,7 +2,7 @@ import { formatDate } from "../../../utils/date";
 import { getIndexedSkills, getSkillColor } from "../helpers";
 
 function ResultsStep({ state, metrics, onBack, onStartAgain }) {
-  const indexedSkills = getIndexedSkills(state.skills);
+  const indexedSkills = getIndexedSkills(state.skills, state.skillLabels);
 
   return (
     <section>
