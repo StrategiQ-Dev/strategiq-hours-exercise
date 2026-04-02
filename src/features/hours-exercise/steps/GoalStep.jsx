@@ -1,4 +1,4 @@
-function GoalStep({ state, errors, setErrors, update, onNext }) {
+function GoalStep({ state, errors, setErrors, update, onNext, isGeneratingSkills }) {
   return (
     <section>
       <h2 className="section-title">The Goal</h2>
@@ -21,6 +21,58 @@ function GoalStep({ state, errors, setErrors, update, onNext }) {
             placeholder="e.g. Sarah Jones"
           />
           {errors.name && <p className="field-error">{errors.name}</p>}
+        </div>
+
+        <div className="field">
+          <label className="label" htmlFor="goal_type">Goal Type</label>
+          <div className="radio-group">
+            <label className="radio-group__label">
+              <input
+                id="goal_type_1"
+                className="radio-group__input"
+                type="radio"
+                value="1"
+                checked={state.goal_type === "1"}
+                onChange={(event) => {
+                  update({ goal_type: event.target.value });
+                  if (errors.goal_type) setErrors((prev) => ({ ...prev, goal_type: undefined }));
+                }}
+              />
+              <span className="ico ico--briefcase"></span>
+              <span className="radio-group__text">Career</span>
+            </label>
+            <label className="radio-group__label">
+              <input
+                id="goal_type_2"
+                className="radio-group__input"
+                type="radio"
+                value="2"
+                checked={state.goal_type === "2"}
+                onChange={(event) => {
+                  update({ goal_type: event.target.value });
+                  if (errors.goal_type) setErrors((prev) => ({ ...prev, goal_type: undefined }));
+                }}
+              />
+              <span className="ico ico--building"></span>
+              <span className="radio-group__text">Business</span>
+            </label>
+            <label className="radio-group__label">
+              <input
+                id="goal_type_3"
+                className="radio-group__input"
+                type="radio"
+                value="3"
+                checked={state.goal_type === "3"}
+                onChange={(event) => {
+                  update({ goal_type: event.target.value });
+                  if (errors.goal_type) setErrors((prev) => ({ ...prev, goal_type: undefined }));
+                }}
+              />
+              <span className="ico ico--user-star"></span>
+              <span className="radio-group__text">Personal</span>
+            </label>
+          </div>
+          {errors.goal_type && <p className="field-error">{errors.goal_type}</p>}
         </div>
 
         <div className="field">
@@ -59,8 +111,8 @@ function GoalStep({ state, errors, setErrors, update, onNext }) {
         </div>
       </div>
 
-      <button className="btn btn--primary" onClick={onNext}>
-        Next: Life Hours -&gt;
+      <button className="btn btn--primary" onClick={onNext} disabled={isGeneratingSkills}>
+        {isGeneratingSkills ? "Generating Skills..." : "Next: Life Hours ->"}
       </button>
     </section>
   );

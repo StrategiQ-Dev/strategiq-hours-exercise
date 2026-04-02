@@ -1,0 +1,22 @@
+@use "variables" as *;
+
+.ico{
+    min-width: 16px;
+    min-height: 16px;
+    display: block;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    &--briefcase{
+        background-image: url("../assets/icons/briefcase-business.svg");
+    }
+
+    &--building{
+        background-image: url("../assets/icons/building.svg");
+    }
+
+    &--user-star{
+        background-image: url("../assets/icons/user-star.svg");
+    }
+}

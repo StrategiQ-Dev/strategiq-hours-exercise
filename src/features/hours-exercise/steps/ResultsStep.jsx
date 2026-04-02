@@ -2,7 +2,7 @@ import { formatDate } from "../../../utils/date";
 import { getIndexedSkills, getSkillColor } from "../helpers";
 
 function ResultsStep({ state, metrics, onBack, onStartAgain }) {
-  const indexedSkills = getIndexedSkills(state.skills);
+  const indexedSkills = getIndexedSkills(state.skills, state.skillLabels);
 
   return (
     <section>
@@ -55,6 +55,7 @@ function ResultsStep({ state, metrics, onBack, onStartAgain }) {
         <h3 className="block-title">Evidence Plan</h3>
         {indexedSkills.map(({ skill, index, score }) => {
           const evidence = state.evidence[index];
+          const suggestions = (state.evidenceSuggestions?.[index] ?? []).slice(0, 6);
           const color = getSkillColor(score);
           return (
             <div key={skill} className="evidence-result">
@@ -63,6 +64,24 @@ function ResultsStep({ state, metrics, onBack, onStartAgain }) {
                 <span style={{ color }}>{score}/10</span>
               </div>
               {evidence.trim() ? <p>{evidence}</p> : <p className="evidence-result__empty">No evidence noted</p>}
+
+              {suggestions.length > 0 && (
+                <div className="evidence-ai-results">
+                  <p className="evidence-ai-results__title">AI suggestions (max 6)</p>
+                  <ul className="evidence-ai-results__list">
+                    {suggestions.map((item, suggestionIndex) => (
+                      <li key={`${skill}-result-suggestion-${suggestionIndex}`} className="evidence-ai-results__item">
+                        <div className="evidence-ai-results__head">
+                          <span>{item.type}</span>
+                          <span>{item.hours}h</span>
+                        </div>
+                        <p className="evidence-ai-results__task">{item.task}</p>
+                        <p className="evidence-ai-results__why">{item.why}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           );
         })}

@@ -21,6 +21,7 @@ function App() {
   const [savedIndicator, setSavedIndicator] = useState(false);
   const [hasSavedData, setHasSavedData] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isGeneratingSkills, setIsGeneratingSkills] = useState(false);
 
   useEffect(() => {
     try {
@@ -72,11 +73,26 @@ function App() {
         errors={errors}
         setErrors={setErrors}
         update={update}
-        onNext={() => {
+        isGeneratingSkills={isGeneratingSkills}
+        onNext={async () => {
           const nextErrors = validateGoalStep(state);
           setErrors(nextErrors);
-          // generateSkills(state);
-          if (Object.keys(nextErrors).length === 0) update({ step: 2 });
+          if (Object.keys(nextErrors).length > 0) return;
+
+          setIsGeneratingSkills(true);
+          try {
+            const skillLabels = await generateSkills(state);
+            setState((prev) => ({
+              ...prev,
+              skillLabels,
+              skills: Array(skillLabels.length).fill(0),
+              evidence: Array(skillLabels.length).fill(""),
+              evidenceSuggestions: Array.from({ length: skillLabels.length }, () => []),
+              step: 2,
+            }));
+          } finally {
+            setIsGeneratingSkills(false);
+          }
         }}
       />
     ),
