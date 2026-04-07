@@ -3,7 +3,7 @@ import { daysRemaining, getDefaultDate } from "../../utils/date";
 import OpenAI from "openai";
 
 export const STORAGE_KEY = "hours-exercise-v1";
-export const LOGO_PATH = "/hours-exercise/assets/strategiq-logo-black.svg";
+export const LOGO_PATH = new URL("../../assets/strategiq-logo-black.svg", import.meta.url).href;
 const GOAL_TYPE_LABELS = {
   "1": "Career",
   "2": "Business",
